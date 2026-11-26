@@ -7,6 +7,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 from tqdm.auto import tqdm
+import click
 
 dtype = {
     "VendorID": "Int64",
@@ -31,9 +32,18 @@ parse_dates = [
     "tpep_pickup_datetime",
     "tpep_dropoff_datetime"
 ]
+import click
 
-def run():
-    # In[9]:
+@click.command()
+@click.option('--pg-user', default='root', help='PostgreSQL user')
+@click.option('--pg-pass', default='root', help='PostgreSQL password')
+@click.option('--pg-host', default='localhost', help='PostgreSQL host')
+@click.option('--pg-port', default=5432, type=int, help='PostgreSQL port')
+@click.option('--pg-db', default='ny_taxi', help='PostgreSQL database name')
+@click.option('--target-table', default='yellow_taxi_data', help='Target table name')
+
+def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table):
+    # params:
     pg_user = 'root'
     pg_pass = 'root'
     pg_host = 'localhost'
@@ -41,10 +51,9 @@ def run():
     pg_db = 'ny_taxi'
     year = 2021
     month = 1
-
     target_table = 'yellow_taxi_data'
-
     chunksize = 100000
+
     # Read a sample of the data
     prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/'
 
@@ -58,7 +67,7 @@ def run():
         dtype=dtype,
         parse_dates=parse_dates,
         iterator=True,
-        chunksize = 100000
+        chunksize = chunksize
     )
 
     # [print(len(df_chunk)) for df_chunk in df_iter]
